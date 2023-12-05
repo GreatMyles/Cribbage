@@ -3,7 +3,7 @@ compileAndRun:
 	make run
 
 compile:
-	gcc -Wall main.c -o main
+	gcc -Wall -o main main.c handCount.c
 
 run:
 	./main
