@@ -7,13 +7,13 @@
 
 /// @brief this array takes the card combination bitstring as an index and returns the number of one bits
 ///        in it's binary representation, i.e. the number of cards in the combination
-int handCombToBitCount[32];
+int handCombToBitCount[handCardCombinations];
 
 /// @brief represents a card with a rank and suit 
 struct card {
   //0:nullcard, 1:1, ..., 11:J, 12:Q, 13:K
   char rank;
-  //0:heart, 1:diamond, 2:spade, 3:club
+  //0:heart, 1:diamond, 2:spade, 3:club, rank value + 8 -> is top card 
   char suit;
 };
 
@@ -34,9 +34,29 @@ void loadHand (char r1, char s1, char r2, char s2, char r3, char s3, char r4, ch
   (hand + 4)->suit = s5;
 }
 
+/// @brief implementation of insertion sort sorts a hand passed in by a pointer to its first card in 
+/// non-increasing order
+int sortHand (struct card *hand, int n) {
+  int i, swpRank, swpSuit, j;
+  for (i = 1; i < n; ++i) {
+    j = i;
+    while (j > 0 && (hand + j - 1)->rank < (hand + j)->rank) {
+      swpRank = (hand + j - 1)->rank;
+      swpSuit = (hand + j - 1)->suit;
+      
+      (hand + j - 1)->rank = (hand + j)->rank;
+      (hand + j - 1)->suit = (hand + j)->suit;
+
+      (hand + j)->rank = swpRank;
+      (hand + j)->suit = swpSuit;
+
+      j = j - 1;
+    }	
+  }
+}
+
 /// @brief initializes hand combination bit count lookup table
 void initHandCount() {
-
   // To initially generate the 
   // table algorithmically 
   handCombToBitCount[0] = 0; 
@@ -52,24 +72,37 @@ void initHandCount() {
   loadHand(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 }
 
+
+/// @brief this function is mainly used for the purpose of mapping the rank of a face card to the value 10
 int rankToValue(struct card *theCard) {
   if ((theCard)->rank == 11 || (theCard)->rank == 12 || (theCard)->rank == 13)
     return 10;
   else return theCard->rank;
 }
 
+/// @brief this function takes a pointer to a subset of a hand as input and returns 2 if the set of cards is summed to fifteen
 int fifteen(struct card *tempHand) {
   int sum = 0;
   for (int i = 0; i < 5; ++i) {
-    printf("%d\n", (tempHand + i)->rank);
     sum += rankToValue((tempHand + i));
   }
-  printf("%s\n", "");
   if (sum == 15)
     return 2;
   else 
     return 0;
 }
+
+/// @brief counts the points due to pairs in a hand subset (assumes the hand is sorted with all null cards at the end)) 
+int pair(struct card *tempHand, int size) {
+  //switch (size) {
+    return 2 * (tempHand->rank == (tempHand+1)->rank);
+	//case 3: return 6 * (tempHand->rank == (tempHand+1)->rank && tempHand->rank == (tempHand+2)->rank);
+    //case 4: return 12 * (tempHand->rank == (tempHand+1)->rank && tempHand->rank == (tempHand+2)->rank && tempHand->rank == (tempHand+3)->rank);
+    //default: printf("pair evaluated incorrectly\n"); return -1;	
+  //}
+
+}
+
 
 /// @brief function recieves a binary string representaiton of a combination of a  hand, that is
 ///        using the Card array defined above, the bit in the string is 1 if the card in the array is 
@@ -83,56 +116,52 @@ int score(int comb) {
   int cardChoiceCounter = comb;
   
   struct card tempHand[5];
-  for (int i = 0; i < 5; ++i) tempHand[0].rank = 0;
+  for (int i = 0; i < 5; ++i) tempHand[i].rank = 0;
 
-  if (cardChoiceCounter - 16 > 0) {
-    
+  // This chunk checks the bits in the comb string and compiles a temporary hand  
+  if (cardChoiceCounter >> 4) {
     tempHand[4] = *(hand + 4);
     cardChoiceCounter -= 16;
   }
-  if (cardChoiceCounter - 8 > 0){
+  if (cardChoiceCounter >> 3){
     
     tempHand[3] = *(hand + 3);
     cardChoiceCounter -= 8;
   }
-  if (cardChoiceCounter - 4 > 0){
+  if (cardChoiceCounter >> 2){
     
     tempHand[2] = *(hand + 2);
     cardChoiceCounter -= 4;
   }
-  if (cardChoiceCounter - 2 > 0){
+  if (cardChoiceCounter >> 1){
     
     tempHand[1] = *(hand + 1);
     cardChoiceCounter -= 2;
   }
-  if (cardChoiceCounter - 2 > 0){
-    
+  if (cardChoiceCounter){
     tempHand[0] = *(hand);
     cardChoiceCounter -= 1;
   }
 
-  //if (cardChoiceCounter != 0) printf("%s", "unexpected behavior in score function\n");
-  
+  sortHand(tempHand, 5);
 
   if (handCombToBitCount[comb] == 5) {
     //fifteen
-    sum += fifteen(tempHand);
+    sum = sum + fifteen(tempHand);
   } else if (handCombToBitCount[comb] == 4) {
     //fifteen
-    sum += fifteen(tempHand);
+	sum = sum + fifteen(tempHand) + pair(tempHand, 4);
 
   } else if (handCombToBitCount[comb] == 3) {
     //fifteen
-    sum += fifteen(tempHand);
+  	sum = sum + fifteen(tempHand) + pair(tempHand, 3);
+
   } else if (handCombToBitCount[comb] == 2) {
     //fifteen
-    // printf("%d", tempHand[0].rank);
-    // printf("%d", tempHand[1].rank);
-    // printf("%d", tempHand[2].rank);
-    // printf("%d", tempHand[3].rank);
-    // printf("%d", tempHand[4].rank);
-    sum += fifteen(tempHand);
+  	sum = sum + fifteen(tempHand) + pair(tempHand, 2);
+
   } else if (handCombToBitCount[comb] == 1) {
+	sum = sum + fifteen(tempHand);
 
   } else if (handCombToBitCount[comb] != 0) {
     printf("%s\n", "Unexpected behavior in \"score\" function");
