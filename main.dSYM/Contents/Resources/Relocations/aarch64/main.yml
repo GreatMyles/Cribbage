@@ -1,0 +1,16 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     main
+relocations:
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100003878, symSize: 0x80 }
+  - { offsetInCU: 0x41, offset: 0x41, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100003878, symSize: 0x80 }
+  - { offsetInCU: 0x26, offset: 0x87, size: 0x8, addend: 0x0, symName: _loadHand, symObjAddr: 0x0, symBinAddr: 0x1000038F8, symSize: 0xBC }
+  - { offsetInCU: 0x4D, offset: 0xAE, size: 0x8, addend: 0x0, symName: _handCombToBitCount, symBinAddr: 0x100008008, symSize: 0x0 }
+  - { offsetInCU: 0x75, offset: 0xD6, size: 0x8, addend: 0x0, symName: _hand, symBinAddr: 0x100008000, symSize: 0x0 }
+  - { offsetInCU: 0xA4, offset: 0x105, size: 0x8, addend: 0x0, symName: _loadHand, symObjAddr: 0x0, symBinAddr: 0x1000038F8, symSize: 0xBC }
+  - { offsetInCU: 0x146, offset: 0x1A7, size: 0x8, addend: 0x0, symName: _initHandCount, symObjAddr: 0xBC, symBinAddr: 0x1000039B4, symSize: 0xC4 }
+  - { offsetInCU: 0x178, offset: 0x1D9, size: 0x8, addend: 0x0, symName: _rankToValue, symObjAddr: 0x180, symBinAddr: 0x100003A78, symSize: 0x78 }
+  - { offsetInCU: 0x1A0, offset: 0x201, size: 0x8, addend: 0x0, symName: _fifteen, symObjAddr: 0x1F8, symBinAddr: 0x100003AF0, symSize: 0xE8 }
+  - { offsetInCU: 0x1F2, offset: 0x253, size: 0x8, addend: 0x0, symName: _score, symObjAddr: 0x2E0, symBinAddr: 0x100003BD8, symSize: 0x2F8 }
+  - { offsetInCU: 0x260, offset: 0x2C1, size: 0x8, addend: 0x0, symName: _handCount, symObjAddr: 0x5D8, symBinAddr: 0x100003ED0, symSize: 0x64 }
+...

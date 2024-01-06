@@ -36,7 +36,6 @@ void loadHand (char r1, char s1, char r2, char s2, char r3, char s3, char r4, ch
 
 /// @brief initializes hand combination bit count lookup table
 void initHandCount() {
-
   // To initially generate the 
   // table algorithmically 
   handCombToBitCount[0] = 0; 
@@ -64,7 +63,7 @@ int fifteen(struct card *tempHand) {
     printf("%d\n", (tempHand + i)->rank);
     sum += rankToValue((tempHand + i));
   }
-  printf("%s\n", "");
+  printf("%s%d\n", "sum: ", sum);
   if (sum == 15)
     return 2;
   else 
@@ -85,35 +84,32 @@ int score(int comb) {
   struct card tempHand[5];
   for (int i = 0; i < 5; ++i) tempHand[0].rank = 0;
 
-  if (cardChoiceCounter - 16 > 0) {
-    
+
+  if (cardChoiceCounter & 16) {
     tempHand[4] = *(hand + 4);
     cardChoiceCounter -= 16;
   }
-  if (cardChoiceCounter - 8 > 0){
+  if (cardChoiceCounter & 8){
     
     tempHand[3] = *(hand + 3);
     cardChoiceCounter -= 8;
   }
-  if (cardChoiceCounter - 4 > 0){
+  if (cardChoiceCounter & 4){
     
     tempHand[2] = *(hand + 2);
     cardChoiceCounter -= 4;
   }
-  if (cardChoiceCounter - 2 > 0){
+  if (cardChoiceCounter & 2){
     
     tempHand[1] = *(hand + 1);
     cardChoiceCounter -= 2;
   }
-  if (cardChoiceCounter - 2 > 0){
+  if (cardChoiceCounter & 1){
     
     tempHand[0] = *(hand);
     cardChoiceCounter -= 1;
   }
-
-  //if (cardChoiceCounter != 0) printf("%s", "unexpected behavior in score function\n");
   
-
   if (handCombToBitCount[comb] == 5) {
     //fifteen
     sum += fifteen(tempHand);
@@ -126,11 +122,6 @@ int score(int comb) {
     sum += fifteen(tempHand);
   } else if (handCombToBitCount[comb] == 2) {
     //fifteen
-    // printf("%d", tempHand[0].rank);
-    // printf("%d", tempHand[1].rank);
-    // printf("%d", tempHand[2].rank);
-    // printf("%d", tempHand[3].rank);
-    // printf("%d", tempHand[4].rank);
     sum += fifteen(tempHand);
   } else if (handCombToBitCount[comb] == 1) {
 
