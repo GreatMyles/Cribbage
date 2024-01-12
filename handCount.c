@@ -22,6 +22,7 @@ struct card *hand;
 
 /// @brief must be called after init function
 void loadHand (char r1, char s1, char r2, char s2, char r3, char s3, char r4, char s4, char r5, char s5) {
+  
   hand->rank = r1;
   hand->suit = s1;
   (hand + 1)->rank = r2;
@@ -105,6 +106,94 @@ int pair(struct card *tempHand, int size) {
 }
 
 
+/// @brief counts the points due to runs in a hand, a 5 card hand should always be passed into this function
+/// @param tempHand 
+/// @return 
+int runs(struct card *tempHand) {
+  int score = -1;
+  //create hand with no dupes to find longest run
+  struct card *tempHandNoDupes = malloc(sizeof(struct card) * 5);
+  tempHandNoDupes->rank = tempHand->rank;
+  tempHandNoDupes->suit = tempHand->suit;
+
+  int j = 1;
+  for (int i = 1; i < 5 ; ++i) {
+    if ((tempHand+i)->rank != (tempHandNoDupes+j-1)->rank){
+      (tempHandNoDupes+j)->rank = (tempHand+i)->rank;
+      (tempHandNoDupes+j)->suit = (tempHand+i)->suit;
+      j += 1;
+    }
+  }
+
+  while (j < 5) {
+    (tempHandNoDupes+j)->rank = 0;
+    (tempHandNoDupes+j)->suit = 0;
+    j++;
+  }
+
+  //scan tempHand to identify type of run (single, double, triple, quad) and return correct amount of points
+	//TODO: debug this mess
+  int maxRunSize = 1;
+	int runSize = 1;
+  for (int i = 1; i < 5; ++i) {
+    if ((tempHandNoDupes+i)->rank != 0 && (tempHandNoDupes+i)->rank == (tempHandNoDupes+i-1)->rank + 1) {
+      runSize++;
+      if (runSize > maxRunSize)
+        {maxRunSize = runSize;}
+    }
+    else
+      {runSize = 1;}
+  }
+
+  switch (maxRunSize) {
+    case 5:
+      score = 5;
+      break;
+    case 4:
+      score = 4;
+      for (int i = 1; i < 5; ++i) {
+        if ((tempHand+i)->rank == (tempHand+i-1)->rank)
+          {score = 8;break;}
+      }
+      break;
+    case 3:{
+      //iterate through hand, checking for pairs
+      int i = 1;
+			int pairs = 0;
+      while (i < 5) {
+				if ((tempHand+i)->rank == (tempHand+i-1)->rank) {
+					pairs++;
+					if (i < 4 && (tempHand+i+1)->rank == (tempHand+i-1)->rank) {
+						score = 9;
+						break;
+					} else {
+						i++;
+					}
+				}
+				i++;
+      }
+			switch (pairs){
+				case 0:
+					score = 3;
+				case 1:
+					score = 6;
+				case 2:
+				  score = 12;
+				case 3:
+					score = 9;
+			}
+			break;
+		}
+    default:
+      score = 0;
+      break;
+  }
+  
+  free(tempHandNoDupes);
+  return score;
+}
+
+
 /// @brief function recieves a binary string representaiton of a combination of a  hand, that is
 ///        using the Card array defined above, the bit in the string is 1 if the card in the array is 
 ///        involved else 0 if not in the combination. Should return the cribbage score on that specific
@@ -148,7 +237,7 @@ int score(int comb) {
 
   if (handCombToBitCount[comb] == 5) {
     //fifteen
-    sum = sum + fifteen(tempHand);
+    sum = sum + fifteen(tempHand) + runs(tempHand);
   } else if (handCombToBitCount[comb] == 4) {
     //fifteen
 	sum = sum + fifteen(tempHand) + pair(tempHand, 4);
