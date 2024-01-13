@@ -11,17 +11,17 @@ int defawlt() {
     3, 1,
     1, 1,
     7, 1, 
-    8, 1
+    8, 9
   );
 
   printf("%d\n", handCount());
-
+  //TODO: this hand is bugged
   loadHand(
-    12, 2,
-    5, 0,
-    13, 1,
-    5, 2, 
-    10, 3
+    12, 3,
+    5, 11,
+    13, 3,
+    5, 3, 
+    11, 3
   );
 
   printf("%d\n", handCount());

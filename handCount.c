@@ -88,15 +88,18 @@ int fifteen(struct card *tempHand) {
   for (int i = 0; i < 5; ++i) {
     sum += rankToValue((tempHand + i));
   }
-  if (sum == 15)
+  if (sum == 15){
+		printf("fifteen score:%d\n", 2);
     return 2;
+	}
   else 
-    return 0;
+    {return 0;}
 }
 
 /// @brief counts the points due to pairs in a hand subset (assumes the hand is sorted with all null cards at the end)) 
 int pair(struct card *tempHand) {
   //switch (size) {
+		printf("pair score:%d\n", 2 * (tempHand->rank == (tempHand+1)->rank));
     return 2 * (tempHand->rank == (tempHand+1)->rank);
 	//case 3: return 6 * (tempHand->rank == (tempHand+1)->rank && tempHand->rank == (tempHand+2)->rank);
     //case 4: return 12 * (tempHand->rank == (tempHand+1)->rank && tempHand->rank == (tempHand+2)->rank && tempHand->rank == (tempHand+3)->rank);
@@ -193,11 +196,57 @@ int runs(struct card *tempHand) {
   }
   
   free(tempHandNoDupes);
+	printf("runs score:%d\n", score);
   return score;
 }
 
+int flush (struct card *tempHand) {
+	int elligibleSuit;
+	for (int i = 1; i < 5; ++i) {
+		if ((tempHand+i)->suit == (tempHand+i-1)->suit) {
+			elligibleSuit = (tempHand+i)->suit;
+			break;
+		}
+	}
+	int elligSuitCount = 0;
+	for (int i = 0; i < 5; ++i) {
+		if ((tempHand+i)->suit == elligibleSuit) {
+			elligSuitCount++;
+		}
+	}
+	for (int i = 0; i < 5; ++i) {
+		if ((tempHand+i)->suit == elligibleSuit + 8) {
+			elligSuitCount++;
+		}
+	}
+	if (elligSuitCount >= 4) {
+		printf("flushscore:%d\n", elligSuitCount);
+		return elligSuitCount;
+	} else {
+		return 0;
+	}
+}
 
-/// @brief function recieves a binary string representaiton of a combination of a  hand, that is
+int nobs(struct card *tempHand) {
+	int topSuit;
+
+	for (int i = 0; i < 5; i++) {
+		if ((tempHand+i)->suit >> 3) {
+			topSuit = (tempHand+i)->suit;
+			break;
+		}
+	}
+
+	for (int i = 0; i < 5; i++) {
+		if ((tempHand+i)->rank == 11 && (tempHand+i)->suit + 8 == topSuit) {
+			printf("nobs score:%d\n", 1);
+			return 1;
+		}
+	}
+	return 0;
+}
+
+/// @brifief function recieves a binary string representaiton of a combination of a  hand, that is
 ///        using the Card array defined above, the bit in the string is 1 if the card in the array is 
 ///        involved else 0 if not in the combination. Should return the cribbage score on that specific
 ///        hand combination
@@ -240,7 +289,7 @@ int score(int comb) {
 
   if (handCombToBitCount[comb] == 5) {
     //fifteen
-    sum = sum + fifteen(tempHand) + runs(tempHand);
+    sum = sum + fifteen(tempHand) + runs(tempHand) + flush(tempHand);
   } else if (handCombToBitCount[comb] == 4) {
     //fifteen
 	sum = sum + fifteen(tempHand);
@@ -254,7 +303,7 @@ int score(int comb) {
   	sum = sum + fifteen(tempHand) + pair(tempHand);
 
   } else if (handCombToBitCount[comb] == 1) {
-	sum = sum + fifteen(tempHand);
+	sum = sum + fifteen(tempHand) + nobs(tempHand);
 
   } else if (handCombToBitCount[comb] != 0) {
     printf("%s\n", "Unexpected behavior in \"score\" function");
