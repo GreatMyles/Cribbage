@@ -95,7 +95,7 @@ int fifteen(struct card *tempHand) {
 }
 
 /// @brief counts the points due to pairs in a hand subset (assumes the hand is sorted with all null cards at the end)) 
-int pair(struct card *tempHand, int size) {
+int pair(struct card *tempHand) {
   //switch (size) {
     return 2 * (tempHand->rank == (tempHand+1)->rank);
 	//case 3: return 6 * (tempHand->rank == (tempHand+1)->rank && tempHand->rank == (tempHand+2)->rank);
@@ -132,11 +132,10 @@ int runs(struct card *tempHand) {
   }
 
   //scan tempHand to identify type of run (single, double, triple, quad) and return correct amount of points
-	//TODO: debug this mess
   int maxRunSize = 1;
 	int runSize = 1;
   for (int i = 1; i < 5; ++i) {
-    if ((tempHandNoDupes+i)->rank != 0 && (tempHandNoDupes+i)->rank == (tempHandNoDupes+i-1)->rank + 1) {
+    if ((tempHandNoDupes+i)->rank != 0 && (tempHandNoDupes+i)->rank == (tempHandNoDupes+i-1)->rank - 1) {
       runSize++;
       if (runSize > maxRunSize)
         {maxRunSize = runSize;}
@@ -175,12 +174,16 @@ int runs(struct card *tempHand) {
 			switch (pairs){
 				case 0:
 					score = 3;
+					break;
 				case 1:
 					score = 6;
+					break;
 				case 2:
 				  score = 12;
+					break;
 				case 3:
 					score = 9;
+					break;
 			}
 			break;
 		}
@@ -240,15 +243,15 @@ int score(int comb) {
     sum = sum + fifteen(tempHand) + runs(tempHand);
   } else if (handCombToBitCount[comb] == 4) {
     //fifteen
-	sum = sum + fifteen(tempHand) + pair(tempHand, 4);
+	sum = sum + fifteen(tempHand);
 
   } else if (handCombToBitCount[comb] == 3) {
     //fifteen
-  	sum = sum + fifteen(tempHand) + pair(tempHand, 3);
+  	sum = sum + fifteen(tempHand);
 
   } else if (handCombToBitCount[comb] == 2) {
     //fifteen
-  	sum = sum + fifteen(tempHand) + pair(tempHand, 2);
+  	sum = sum + fifteen(tempHand) + pair(tempHand);
 
   } else if (handCombToBitCount[comb] == 1) {
 	sum = sum + fifteen(tempHand);
